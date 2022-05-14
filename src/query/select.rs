@@ -3,7 +3,7 @@ use core::fmt::Debug;
 use core::marker::PhantomData;
 pub use sea_query::JoinType;
 use sea_query::{Alias, DynIden, Expr, IntoColumnRef, SeaRc, SelectStatement, SimpleExpr};
-
+use serde::{Serialize,Deserialize};
 /// Defines a structure to perform select operations
 #[derive(Clone, Debug)]
 pub struct Select<E>

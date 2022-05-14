@@ -43,7 +43,7 @@ pub fn expand_derive_entity_model(data: Data, attrs: Vec<Attribute>) -> syn::Res
         .as_ref()
         .map(|table_name| {
             quote! {
-                #[derive(Copy, Clone, Default, Debug, sea_orm::prelude::DeriveEntity)]
+                #[derive(Copy, Clone,Debug, sea_orm::prelude::DeriveEntity)]
                 pub struct Entity;
 
                 #[automatically_derived]
