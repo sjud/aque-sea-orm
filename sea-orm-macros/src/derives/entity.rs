@@ -112,6 +112,7 @@ impl DeriveEntity {
 
         quote!(
             #[automatically_derived]
+            #[typetag::serde]
             impl sea_orm::Iden for #ident {
                 fn unquoted(&self, s: &mut dyn std::fmt::Write) {
                     write!(s, "{}", self.as_str()).unwrap();
@@ -125,6 +126,7 @@ impl DeriveEntity {
 
         quote!(
             #[automatically_derived]
+            #[typetag::serde]
             impl sea_orm::IdenStatic for #ident {
                 fn as_str(&self) -> &str {
                     <Self as sea_orm::EntityName>::table_name(self)

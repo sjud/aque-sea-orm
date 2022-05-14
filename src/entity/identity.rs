@@ -3,7 +3,7 @@ use sea_query::{Alias, DynIden, Iden, IntoIden, SeaRc};
 use std::fmt;
 
 /// Defines an operation for an Entity
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone,serde_derive::Serialize,serde_derive::Deserialize)]
 pub enum Identity {
     /// Performs one operation
     Unary(DynIden),
@@ -13,6 +13,7 @@ pub enum Identity {
     Ternary(DynIden, DynIden, DynIden),
 }
 
+#[typetag::serde]
 impl Iden for Identity {
     fn unquoted(&self, s: &mut dyn fmt::Write) {
         match self {

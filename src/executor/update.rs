@@ -2,7 +2,7 @@ use crate::{
     error::*, ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, IntoActiveModel,
     Iterable, SelectModel, SelectorRaw, Statement, UpdateMany, UpdateOne,
 };
-use sea_query::{Alias, Expr, FromValueTuple, Query, UpdateStatement};
+use sea_query::{Alias, Expr, FromValueTuple, Query, Returning, UpdateStatement};
 use std::future::Future;
 
 /// Defines an update operation
@@ -91,6 +91,7 @@ where
 {
     match db.support_returning() {
         true => {
+            /*
             let mut returning = Query::select();
             returning.exprs(<A::Entity as EntityTrait>::Column::iter().map(|c| {
                 let col = Expr::col(c);
@@ -101,6 +102,9 @@ where
                     None => col.into(),
                 }
             }));
+            */
+            let mut returning = Returning::new()
+                .columns(<A::Entity as EntityTrait>::Column::iter());
             query.returning(returning);
             let db_backend = db.get_database_backend();
             let found: Option<<A::Entity as EntityTrait>::Model> =

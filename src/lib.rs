@@ -303,7 +303,7 @@ pub mod query;
 pub mod schema;
 #[doc(hidden)]
 #[cfg(feature = "macros")]
-pub mod tests_cfg;
+//pub mod tests_cfg;
 mod util;
 
 pub use database::*;

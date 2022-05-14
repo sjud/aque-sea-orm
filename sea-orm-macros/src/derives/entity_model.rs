@@ -43,7 +43,7 @@ pub fn expand_derive_entity_model(data: Data, attrs: Vec<Attribute>) -> syn::Res
         .as_ref()
         .map(|table_name| {
             quote! {
-                #[derive(Copy, Clone,Debug, sea_orm::prelude::DeriveEntity)]
+                #[derive(Copy, Clone,Debug,Default, sea_orm::prelude::DeriveEntity,serde_derive::Serialize,serde_derive::Deserialize)]
                 pub struct Entity;
 
                 #[automatically_derived]
@@ -316,7 +316,7 @@ pub fn expand_derive_entity_model(data: Data, attrs: Vec<Attribute>) -> syn::Res
                 quote! { (#primary_key_types) }
             };
             quote! {
-            #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey)]
+            #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey,serde_derive::Serialize,serde_derive::Deserialize)]
             pub enum PrimaryKey {
                 #primary_keys
             }
@@ -334,7 +334,7 @@ pub fn expand_derive_entity_model(data: Data, attrs: Vec<Attribute>) -> syn::Res
         .unwrap_or_default();
 
     Ok(quote! {
-        #[derive(Copy, Clone, Debug, sea_orm::prelude::EnumIter, sea_orm::prelude::DeriveColumn)]
+        #[derive(Copy, Clone, Debug, sea_orm::prelude::EnumIter, sea_orm::prelude::DeriveColumn,serde_derive::Serialize,serde_derive::Deserialize)]
         pub enum Column {
             #columns_enum
         }

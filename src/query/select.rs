@@ -5,7 +5,7 @@ pub use sea_query::JoinType;
 use sea_query::{Alias, DynIden, Expr, IntoColumnRef, SeaRc, SelectStatement, SimpleExpr};
 use serde::{Serialize,Deserialize};
 /// Defines a structure to perform select operations
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct Select<E>
 where
     E: EntityTrait,

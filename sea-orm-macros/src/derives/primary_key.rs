@@ -56,6 +56,7 @@ pub fn expand_derive_primary_key(ident: Ident, data: Data) -> syn::Result<TokenS
 
     Ok(quote!(
         #[automatically_derived]
+        #[typetag::serde]
         impl sea_orm::Iden for #ident {
             fn unquoted(&self, s: &mut dyn std::fmt::Write) {
                 write!(s, "{}", self.as_str()).unwrap();

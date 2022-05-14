@@ -113,6 +113,7 @@ pub fn expand_derive_column(ident: &Ident, data: &Data) -> syn::Result<TokenStre
         #impl_iden
 
         #[automatically_derived]
+        #[typetag::serde]
         impl sea_orm::IdenStatic for #ident {
             fn as_str(&self) -> &str {
                 self.default_as_str()
@@ -132,6 +133,7 @@ pub fn expand_derive_custom_column(ident: &Ident, data: &Data) -> syn::Result<To
         #impl_col_from_str
 
         #[automatically_derived]
+        #[typetag::serde]
         impl sea_orm::Iden for #ident {
             fn unquoted(&self, s: &mut dyn std::fmt::Write) {
                 write!(s, "{}", self.as_str()).unwrap();

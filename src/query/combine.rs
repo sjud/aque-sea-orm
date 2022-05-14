@@ -11,9 +11,10 @@ use sea_query::{
 macro_rules! select_def {
     ( $ident: ident, $str: expr ) => {
         /// Implements the traits [Iden] and [IdenStatic] for a type
-        #[derive(Debug, Clone, Copy)]
+        #[derive(Debug, Clone, Copy,serde_derive::Serialize,serde_derive::Deserialize)]
         pub struct $ident;
 
+        #[typetag::serde]
         impl Iden for $ident {
             fn unquoted(&self, s: &mut dyn std::fmt::Write) {
                 write!(s, "{}", self.as_str()).unwrap();
