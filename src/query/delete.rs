@@ -4,26 +4,28 @@ use crate::{
 };
 use core::marker::PhantomData;
 use sea_query::DeleteStatement;
+use serde::de::DeserializeOwned;
+use serde::{Serialize,Deserialize};
 
 /// Defines the structure for a delete operation
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,serde_derive::Serialize,serde_derive::Deserialize)]
 pub struct Delete;
 
 /// Perform a delete operation on a model
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct DeleteOne<A>
-where
-    A: ActiveModelTrait,
-{
+    where
+        A: ActiveModelTrait {
     pub(crate) query: DeleteStatement,
+    #[serde(bound="A:Serialize+DeserializeOwned")]
     pub(crate) model: A,
 }
 
 /// Perform a delete operation on multiple models
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,serde_derive::Serialize,serde_derive::Deserialize)]
 pub struct DeleteMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     pub(crate) query: DeleteStatement,
     pub(crate) entity: PhantomData<E>,
@@ -61,10 +63,10 @@ impl Delete {
     /// );
     /// ```
     pub fn one<E, A, M>(model: M) -> DeleteOne<A>
-    where
-        E: EntityTrait,
-        A: ActiveModelTrait<Entity = E>,
-        M: IntoActiveModel<A>,
+        where
+            E: EntityTrait,
+            A: ActiveModelTrait<Entity = E> + Serialize + DeserializeOwned,
+            M: IntoActiveModel<A>,
     {
         let myself = DeleteOne {
             query: DeleteStatement::new()
@@ -89,8 +91,8 @@ impl Delete {
     /// );
     /// ```
     pub fn many<E>(entity: E) -> DeleteMany<E>
-    where
-        E: EntityTrait,
+        where
+            E: EntityTrait,
     {
         DeleteMany {
             query: DeleteStatement::new()
@@ -102,8 +104,8 @@ impl Delete {
 }
 
 impl<A> DeleteOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     pub(crate) fn prepare(mut self) -> Self {
         for key in <A::Entity as EntityTrait>::PrimaryKey::iter() {
@@ -120,8 +122,8 @@ where
 }
 
 impl<A> QueryFilter for DeleteOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     type QueryStatement = DeleteStatement;
 
@@ -131,8 +133,8 @@ where
 }
 
 impl<E> QueryFilter for DeleteMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     type QueryStatement = DeleteStatement;
 
@@ -142,8 +144,8 @@ where
 }
 
 impl<A> QueryTrait for DeleteOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     type QueryStatement = DeleteStatement;
 
@@ -161,8 +163,8 @@ where
 }
 
 impl<E> QueryTrait for DeleteMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     type QueryStatement = DeleteStatement;
 
@@ -191,8 +193,8 @@ mod tests {
                 id: 1,
                 name: "Apple Pie".to_owned(),
             })
-            .build(DbBackend::Postgres)
-            .to_string(),
+                .build(DbBackend::Postgres)
+                .to_string(),
             r#"DELETE FROM "cake" WHERE "cake"."id" = 1"#,
         );
         assert_eq!(
@@ -200,8 +202,8 @@ mod tests {
                 id: ActiveValue::set(1),
                 name: ActiveValue::set("Apple Pie".to_owned()),
             })
-            .build(DbBackend::Postgres)
-            .to_string(),
+                .build(DbBackend::Postgres)
+                .to_string(),
             r#"DELETE FROM "cake" WHERE "cake"."id" = 1"#,
         );
     }

@@ -4,26 +4,29 @@ use crate::{
 };
 use core::marker::PhantomData;
 use sea_query::{Alias, Expr, IntoIden, SimpleExpr, UpdateStatement};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 /// Defines a structure to perform UPDATE query operations on a ActiveModel
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,serde_derive::Serialize,serde_derive::Deserialize)]
 pub struct Update;
 
 /// Defines an UPDATE operation on one ActiveModel
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,serde::Serialize,serde::Deserialize)]
 pub struct UpdateOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait,
 {
     pub(crate) query: UpdateStatement,
+    #[serde(bound="A:Serialize+DeserializeOwned")]
     pub(crate) model: A,
 }
 
 /// Defines an UPDATE operation on multiple ActiveModels
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,serde_derive::Serialize,serde_derive::Deserialize)]
 pub struct UpdateMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     pub(crate) query: UpdateStatement,
     pub(crate) entity: PhantomData<E>,
@@ -46,9 +49,9 @@ impl Update {
     /// );
     /// ```
     pub fn one<E, A>(model: A) -> UpdateOne<A>
-    where
-        E: EntityTrait,
-        A: ActiveModelTrait<Entity = E>,
+        where
+            E: EntityTrait,
+            A: ActiveModelTrait<Entity = E> + Serialize + DeserializeOwned,
     {
         UpdateOne {
             query: UpdateStatement::new()
@@ -56,8 +59,8 @@ impl Update {
                 .to_owned(),
             model,
         }
-        .prepare_filters()
-        .prepare_values()
+            .prepare_filters()
+            .prepare_values()
     }
 
     /// Update many ActiveModel
@@ -75,8 +78,8 @@ impl Update {
     /// );
     /// ```
     pub fn many<E>(entity: E) -> UpdateMany<E>
-    where
-        E: EntityTrait,
+        where
+            E: EntityTrait,
     {
         UpdateMany {
             query: UpdateStatement::new().table(entity.table_ref()).to_owned(),
@@ -86,8 +89,8 @@ impl Update {
 }
 
 impl<A> UpdateOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     fn prepare_filters(mut self) -> Self {
         for key in <A::Entity as EntityTrait>::PrimaryKey::iter() {
@@ -124,8 +127,8 @@ where
 }
 
 impl<A> QueryFilter for UpdateOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     type QueryStatement = UpdateStatement;
 
@@ -135,8 +138,8 @@ where
 }
 
 impl<E> QueryFilter for UpdateMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     type QueryStatement = UpdateStatement;
 
@@ -146,8 +149,8 @@ where
 }
 
 impl<A> QueryTrait for UpdateOne<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     type QueryStatement = UpdateStatement;
 
@@ -165,8 +168,8 @@ where
 }
 
 impl<E> QueryTrait for UpdateMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     type QueryStatement = UpdateStatement;
 
@@ -184,13 +187,13 @@ where
 }
 
 impl<E> UpdateMany<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     /// Add the models to update to Self
     pub fn set<A>(mut self, model: A) -> Self
-    where
-        A: ActiveModelTrait<Entity = E>,
+        where
+            A: ActiveModelTrait<Entity = E>,
     {
         for col in E::Column::iter() {
             let av = model.get(col);
@@ -203,8 +206,8 @@ where
 
     /// Creates a [SimpleExpr] from a column
     pub fn col_expr<T>(mut self, col: T, expr: SimpleExpr) -> Self
-    where
-        T: IntoIden,
+        where
+            T: IntoIden,
     {
         self.query.col_expr(col, expr);
         self
@@ -224,8 +227,8 @@ mod tests {
                 id: ActiveValue::set(1),
                 name: ActiveValue::set("Apple Pie".to_owned()),
             })
-            .build(DbBackend::Postgres)
-            .to_string(),
+                .build(DbBackend::Postgres)
+                .to_string(),
             r#"UPDATE "cake" SET "name" = 'Apple Pie' WHERE "cake"."id" = 1"#,
         );
     }
@@ -238,8 +241,8 @@ mod tests {
                 name: ActiveValue::set("Orange".to_owned()),
                 cake_id: ActiveValue::not_set(),
             })
-            .build(DbBackend::Postgres)
-            .to_string(),
+                .build(DbBackend::Postgres)
+                .to_string(),
             r#"UPDATE "fruit" SET "name" = 'Orange' WHERE "fruit"."id" = 1"#,
         );
     }
@@ -252,8 +255,8 @@ mod tests {
                 name: ActiveValue::unchanged("Apple".to_owned()),
                 cake_id: ActiveValue::set(Some(3)),
             })
-            .build(DbBackend::Postgres)
-            .to_string(),
+                .build(DbBackend::Postgres)
+                .to_string(),
             r#"UPDATE "fruit" SET "cake_id" = 3 WHERE "fruit"."id" = 2"#,
         );
     }

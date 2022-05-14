@@ -3,6 +3,8 @@ use crate::{
 };
 use sea_query::DeleteStatement;
 use std::future::Future;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 /// Handles DELETE operations in a ActiveModel using [DeleteStatement]
 #[derive(Clone, Debug)]
@@ -19,7 +21,7 @@ pub struct DeleteResult {
 
 impl<'a, A: 'a> DeleteOne<A>
 where
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     /// Execute a DELETE operation on one ActiveModel
     pub fn exec<C>(self, db: &'a C) -> impl Future<Output = Result<DeleteResult, DbErr>> + '_

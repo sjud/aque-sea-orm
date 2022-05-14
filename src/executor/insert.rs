@@ -4,12 +4,14 @@ use crate::{
 };
 use sea_query::{Alias, Expr, FromValueTuple, Iden, InsertStatement, IntoColumnRef, Query, Returning, ValueTuple};
 use std::{future::Future, marker::PhantomData};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 /// Defines a structure to perform INSERT operations in an ActiveModel
 #[derive(Debug)]
 pub struct Inserter<A>
 where
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     primary_key: Option<ValueTuple>,
     query: InsertStatement,
@@ -20,7 +22,7 @@ where
 #[derive(Debug)]
 pub struct InsertResult<A>
 where
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     /// The id performed when AUTOINCREMENT was performed on the PrimaryKey
     pub last_insert_id: <<<A as ActiveModelTrait>::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType,
@@ -28,7 +30,7 @@ where
 
 impl<A> Insert<A>
 where
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     /// Execute an insert operation
     #[allow(unused_mut)]
@@ -64,7 +66,7 @@ where
 
 impl<A> Inserter<A>
 where
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     /// Instantiate a new insert operation
     pub fn new(primary_key: Option<ValueTuple>, query: InsertStatement) -> Self {
@@ -106,7 +108,7 @@ async fn exec_insert<A, C>(
 ) -> Result<InsertResult<A>, DbErr>
 where
     C: ConnectionTrait,
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     type PrimaryKey<A> = <<A as ActiveModelTrait>::Entity as EntityTrait>::PrimaryKey;
     type ValueTypeOf<A> = <PrimaryKey<A> as PrimaryKeyTrait>::ValueType;
@@ -141,7 +143,7 @@ async fn exec_insert_with_returning<A, C>(
 where
     <A::Entity as EntityTrait>::Model: IntoActiveModel<A>,
     C: ConnectionTrait,
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned,
 {
     let db_backend = db.get_database_backend();
     let found = match db.support_returning() {

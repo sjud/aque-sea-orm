@@ -6,10 +6,11 @@ use core::marker::PhantomData;
 use sea_query::{Alias, Expr, InsertStatement, ValueTuple};
 
 /// Performs INSERT operations on a ActiveModel
-#[derive(Debug)]
+#[derive(Debug,serde_derive::Serialize,serde_derive::Deserialize)]
+#[serde(bound = "")]
 pub struct Insert<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait,
 {
     pub(crate) query: InsertStatement,
     pub(crate) columns: Vec<bool>,
@@ -18,8 +19,8 @@ where
 }
 
 impl<A> Default for Insert<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait,
 {
     fn default() -> Self {
         Self::new()
@@ -27,8 +28,8 @@ where
 }
 
 impl<A> Insert<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait,
 {
     pub(crate) fn new() -> Self {
         Self {
@@ -73,8 +74,8 @@ where
     /// );
     /// ```
     pub fn one<M>(m: M) -> Insert<A>
-    where
-        M: IntoActiveModel<A>,
+        where
+            M: IntoActiveModel<A>,
     {
         Self::new().add(m)
     }
@@ -101,9 +102,9 @@ where
     /// );
     /// ```
     pub fn many<M, I>(models: I) -> Self
-    where
-        M: IntoActiveModel<A>,
-        I: IntoIterator<Item = M>,
+        where
+            M: IntoActiveModel<A>,
+            I: IntoIterator<Item = M>,
     {
         Self::new().add_many(models)
     }
@@ -111,8 +112,8 @@ where
     /// Add a Model to Self
     #[allow(clippy::should_implement_trait)]
     pub fn add<M>(mut self, m: M) -> Self
-    where
-        M: IntoActiveModel<A>,
+        where
+            M: IntoActiveModel<A>,
     {
         let mut am: A = m.into_active_model();
         self.primary_key =
@@ -151,9 +152,9 @@ where
 
     /// Add many Models to Self
     pub fn add_many<M, I>(mut self, models: I) -> Self
-    where
-        M: IntoActiveModel<A>,
-        I: IntoIterator<Item = M>,
+        where
+            M: IntoActiveModel<A>,
+            I: IntoIterator<Item = M>,
     {
         for model in models.into_iter() {
             self = self.add(model);
@@ -163,8 +164,8 @@ where
 }
 
 impl<A> QueryTrait for Insert<A>
-where
-    A: ActiveModelTrait,
+    where
+        A: ActiveModelTrait,
 {
     type QueryStatement = InsertStatement;
 

@@ -6,6 +6,8 @@ use crate::{
 use async_trait::async_trait;
 pub use sea_query::Value;
 use std::fmt::Debug;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 /// A Trait for a Model
 #[async_trait]
@@ -42,7 +44,8 @@ pub trait ModelTrait: Clone + Send + Debug {
     where
         Self: IntoActiveModel<A>,
         C: ConnectionTrait,
-        A: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'a,
+        A: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'a
+        + Serialize + DeserializeOwned,
     {
         self.into_active_model().delete(db).await
     }

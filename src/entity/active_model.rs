@@ -4,6 +4,8 @@ use crate::{
 use async_trait::async_trait;
 use sea_query::{Nullable, ValueTuple};
 use std::fmt::Debug;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 pub use ActiveValue::NotSet;
 
@@ -35,7 +37,7 @@ pub use ActiveValue::NotSet;
 ///     r#"UPDATE "fruit" SET "name" = 'Orange' WHERE "fruit"."id" = 1"#
 /// );
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,serde_derive::Deserialize,serde_derive::Serialize)]
 pub enum ActiveValue<V>
 where
     V: Into<Value>,
@@ -275,7 +277,7 @@ pub trait ActiveModelTrait: Clone + Debug {
     async fn insert<'a, C>(self, db: &'a C) -> Result<<Self::Entity as EntityTrait>::Model, DbErr>
     where
         <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self>,
-        Self: ActiveModelBehavior + 'a,
+        Self: ActiveModelBehavior + 'a + Serialize + DeserializeOwned,
         C: ConnectionTrait,
     {
         let am = ActiveModelBehavior::before_save(self, true)?;
@@ -397,7 +399,7 @@ pub trait ActiveModelTrait: Clone + Debug {
     async fn update<'a, C>(self, db: &'a C) -> Result<<Self::Entity as EntityTrait>::Model, DbErr>
     where
         <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self>,
-        Self: ActiveModelBehavior + 'a,
+        Self: ActiveModelBehavior + 'a + Serialize + DeserializeOwned,
         C: ConnectionTrait,
     {
         let am = ActiveModelBehavior::before_save(self, false)?;
@@ -410,7 +412,7 @@ pub trait ActiveModelTrait: Clone + Debug {
     async fn save<'a, C>(self, db: &'a C) -> Result<Self, DbErr>
     where
         <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self>,
-        Self: ActiveModelBehavior + 'a,
+        Self: ActiveModelBehavior + 'a + Serialize + DeserializeOwned,
         C: ConnectionTrait,
     {
         let mut is_update = true;
@@ -474,7 +476,7 @@ pub trait ActiveModelTrait: Clone + Debug {
     /// ```
     async fn delete<'a, C>(self, db: &'a C) -> Result<DeleteResult, DbErr>
     where
-        Self: ActiveModelBehavior + 'a,
+        Self: ActiveModelBehavior + 'a + Serialize + DeserializeOwned,
         C: ConnectionTrait,
     {
         let am = ActiveModelBehavior::before_delete(self)?;

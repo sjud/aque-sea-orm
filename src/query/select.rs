@@ -7,30 +7,30 @@ use serde::{Serialize,Deserialize};
 /// Defines a structure to perform select operations
 #[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct Select<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     pub(crate) query: SelectStatement,
     pub(crate) entity: PhantomData<E>,
 }
 
 /// Defines a structure to perform a SELECT operation on two Models
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct SelectTwo<E, F>
-where
-    E: EntityTrait,
-    F: EntityTrait,
+    where
+        E: EntityTrait,
+        F: EntityTrait,
 {
     pub(crate) query: SelectStatement,
     pub(crate) entity: PhantomData<(E, F)>,
 }
 
 /// Defines a structure to perform a SELECT operation on many Models
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct SelectTwoMany<E, F>
-where
-    E: EntityTrait,
-    F: EntityTrait,
+    where
+        E: EntityTrait,
+        F: EntityTrait,
 {
     pub(crate) query: SelectStatement,
     pub(crate) entity: PhantomData<(E, F)>,
@@ -86,8 +86,8 @@ impl_trait!(QueryFilter);
 impl_trait!(QueryOrder);
 
 impl<C> IntoSimpleExpr for C
-where
-    C: ColumnTrait,
+    where
+        C: ColumnTrait,
 {
     fn into_simple_expr(self) -> SimpleExpr {
         SimpleExpr::Column(self.as_column_ref().into_column_ref())
@@ -101,16 +101,16 @@ impl IntoSimpleExpr for SimpleExpr {
 }
 
 impl<E> Select<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     pub(crate) fn new() -> Self {
         Self {
             query: SelectStatement::new(),
             entity: PhantomData,
         }
-        .prepare_select()
-        .prepare_from()
+            .prepare_select()
+            .prepare_from()
     }
 
     fn prepare_select(mut self) -> Self {
@@ -141,8 +141,8 @@ where
 }
 
 impl<E> QueryTrait for Select<E>
-where
-    E: EntityTrait,
+    where
+        E: EntityTrait,
 {
     type QueryStatement = SelectStatement;
     fn query(&mut self) -> &mut SelectStatement {

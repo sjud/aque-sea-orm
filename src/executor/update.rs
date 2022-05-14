@@ -4,6 +4,8 @@ use crate::{
 };
 use sea_query::{Alias, Expr, FromValueTuple, Query, Returning, UpdateStatement};
 use std::future::Future;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 /// Defines an update operation
 #[derive(Clone, Debug)]
@@ -19,9 +21,9 @@ pub struct UpdateResult {
     pub rows_affected: u64,
 }
 
-impl<'a, A: 'a> UpdateOne<A>
+impl<'a, A> UpdateOne<A>
 where
-    A: ActiveModelTrait,
+    A: ActiveModelTrait + Serialize + DeserializeOwned +'a,
 {
     /// Execute an update operation on an ActiveModel
     pub async fn exec<'b, C>(self, db: &'b C) -> Result<<A::Entity as EntityTrait>::Model, DbErr>

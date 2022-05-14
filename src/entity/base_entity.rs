@@ -5,6 +5,8 @@ use crate::{
 };
 use sea_query::{Alias, Iden, IntoIden, IntoTableRef, IntoValueTuple, TableRef};
 use std::fmt::Debug;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 pub use strum::IntoEnumIterator as Iterable;
 
 /// Ensure the identifier for an Entity can be converted to a static str
@@ -357,7 +359,7 @@ pub trait EntityTrait: EntityName {
     /// ```
     fn insert<A>(model: A) -> Insert<A>
     where
-        A: ActiveModelTrait<Entity = Self>,
+        A: ActiveModelTrait<Entity = Self> + Serialize + DeserializeOwned,
     {
         Insert::one(model)
     }
@@ -458,7 +460,7 @@ pub trait EntityTrait: EntityName {
     /// ```
     fn insert_many<A, I>(models: I) -> Insert<A>
     where
-        A: ActiveModelTrait<Entity = Self>,
+        A: ActiveModelTrait<Entity = Self> + Serialize + DeserializeOwned,
         I: IntoIterator<Item = A>,
     {
         Insert::many(models)
@@ -583,7 +585,7 @@ pub trait EntityTrait: EntityName {
     /// ```
     fn update<A>(model: A) -> UpdateOne<A>
     where
-        A: ActiveModelTrait<Entity = Self>,
+        A: ActiveModelTrait<Entity = Self> + Serialize + DeserializeOwned,
     {
         Update::one(model)
     }
@@ -688,7 +690,7 @@ pub trait EntityTrait: EntityName {
     /// ```
     fn delete<A>(model: A) -> DeleteOne<A>
     where
-        A: ActiveModelTrait<Entity = Self>,
+        A: ActiveModelTrait<Entity = Self> + Serialize + DeserializeOwned,
     {
         Delete::one(model)
     }
