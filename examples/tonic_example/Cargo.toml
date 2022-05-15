@@ -7,7 +7,7 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
-members = [".", "entity", "migration"]
+members = ["", "entity", "migration"]
 
 [dependencies]
 tonic = "0.7"
@@ -18,15 +18,15 @@ prost = "0.10.0"
 serde = "1.0"
 
 [lib]
-path = "./src/lib.rs"
+path = "src/lib.rs"
 
 [[bin]]
 name="server"
-path="./src/server.rs"
+path= "src/server.rs"
 
 [[bin]]
 name="client"
-path="./src/client.rs"
+path= "src/client.rs"
 
 [build-dependencies]
 tonic-build = "0.7"

@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [workspace]
-members = [".", "entity", "migration"]
+members = ["", "entity", "migration"]
 
 [dependencies]
 async-stream = { version = "^0.3" }

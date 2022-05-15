@@ -4,7 +4,7 @@ use crate::{
 use sea_query::DeleteStatement;
 use std::future::Future;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Serialize,Deserialize};
 
 /// Handles DELETE operations in a ActiveModel using [DeleteStatement]
 #[derive(Clone, Debug,Serialize,Deserialize)]

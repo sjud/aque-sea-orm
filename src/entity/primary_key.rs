@@ -2,6 +2,8 @@ use super::{ColumnTrait, IdenStatic, Iterable};
 use crate::{TryFromU64, TryGetableMany};
 use sea_query::{FromValueTuple, IntoValueTuple};
 use std::fmt::Debug;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 //LINT: composite primary key cannot auto increment
 /// A Trait for to be used to define a Primary Key.
@@ -37,7 +39,7 @@ use std::fmt::Debug;
 /// }
 /// ```
 /// See module level docs [crate::entity] for a full example
-pub trait PrimaryKeyTrait: IdenStatic + Iterable {
+pub trait PrimaryKeyTrait: IdenStatic + Iterable  {
     #[allow(missing_docs)]
     type ValueType: Sized
         + Send
@@ -46,7 +48,9 @@ pub trait PrimaryKeyTrait: IdenStatic + Iterable {
         + IntoValueTuple
         + FromValueTuple
         + TryGetableMany
-        + TryFromU64;
+        + TryFromU64
+        + DeserializeOwned
+        + Serialize;
 
     /// Method to call to perform `AUTOINCREMENT` operation on a Primary Kay
     fn auto_increment() -> bool;

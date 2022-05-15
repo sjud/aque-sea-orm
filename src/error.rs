@@ -1,3 +1,4 @@
+use serde::{Serialize,Deserialize};
 /// An error from unsuccessful database operations
 #[derive(Debug, PartialEq, Eq, Clone,Serialize,Deserialize)]
 pub enum DbErr {

@@ -1,11 +1,11 @@
 use crate::{
-    error::*, ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, Insert, IntoActiveModel,
+    error::*, ActiveModelTrait, ConnectionTrait, EntityTrait, Insert, IntoActiveModel,
     Iterable, PrimaryKeyTrait, SelectModel, SelectorRaw, Statement, TryFromU64,
 };
-use sea_query::{Alias, Expr, FromValueTuple, Iden, InsertStatement, IntoColumnRef, Query, Returning, ValueTuple};
+use sea_query::{FromValueTuple, Iden, InsertStatement, IntoColumnRef, Returning,ValueTuple};
 use std::{future::Future, marker::PhantomData};
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Serialize,Deserialize};
 
 /// Defines a structure to perform INSERT operations in an ActiveModel
 #[derive(Debug)]
@@ -19,13 +19,17 @@ where
 }
 
 /// The result of an INSERT operation on an ActiveModel
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
+#[serde(bound="A:Serialize + DeserializeOwned")]
 pub struct InsertResult<A>
 where
-    A: ActiveModelTrait + Serialize + DeserializeOwned,
+    A: ActiveModelTrait ,
 {
     /// The id performed when AUTOINCREMENT was performed on the PrimaryKey
-    pub last_insert_id: <<<A as ActiveModelTrait>::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType,
+    //#[serde(bound="ValueType:Serialize")]
+    pub last_insert_id: <<<A as ActiveModelTrait>::Entity as EntityTrait>
+    ::PrimaryKey as PrimaryKeyTrait>
+    ::ValueType,
 }
 
 impl<A> Insert<A>
@@ -159,8 +163,7 @@ where
                     None => col.into(),
                 }
             }));*/
-            let mut returning = Returning::new();
-            let returning = returning.columns(<A::Entity as EntityTrait>::Column::iter());
+            let returning = Returning::new().columns(<A::Entity as EntityTrait>::Column::iter());
             insert_statement.returning(returning);
             SelectorRaw::<SelectModel<<A::Entity as EntityTrait>::Model>>::from_statement(
                 db_backend.build(&insert_statement),

@@ -1,11 +1,11 @@
 use crate::{
-    error::*, ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, IntoActiveModel,
+    error::*, ActiveModelTrait, ConnectionTrait, EntityTrait, IntoActiveModel,
     Iterable, SelectModel, SelectorRaw, Statement, UpdateMany, UpdateOne,
 };
-use sea_query::{Alias, Expr, FromValueTuple, Query, Returning, UpdateStatement};
+use sea_query::{FromValueTuple, Returning, UpdateStatement};
 use std::future::Future;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Serialize,Deserialize};
 
 /// Defines an update operation
 #[derive(Clone, Debug)]
@@ -15,7 +15,7 @@ pub struct Updater {
 }
 
 /// The result of an update operation on an ActiveModel
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq,Serialize,Deserialize)]
 pub struct UpdateResult {
     /// The rows affected by the update operation
     pub rows_affected: u64,
@@ -105,7 +105,7 @@ where
                 }
             }));
             */
-            let mut returning = Returning::new()
+            let returning = Returning::new()
                 .columns(<A::Entity as EntityTrait>::Column::iter());
             query.returning(returning);
             let db_backend = db.get_database_backend();

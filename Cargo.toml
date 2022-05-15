@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "sea-orm-macros", "sea-orm-codegen"]
+members = ["", "sea-orm-macros", "sea-orm-codegen"]
 
 [package]
 name = "sea-orm"
@@ -52,7 +52,7 @@ actix-rt = { version = "2.2.0" }
 maplit = { version = "^1" }
 rust_decimal_macros = { version = "^1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-sea-orm = { path = ".", features = ["mock", "debug-print"] }
+sea-orm = { path = "", features = ["mock", "debug-print"] }
 pretty_assertions = { version = "^0.7" }
 
 [features]
