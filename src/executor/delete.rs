@@ -7,13 +7,13 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 /// Handles DELETE operations in a ActiveModel using [DeleteStatement]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct Deleter {
     query: DeleteStatement,
 }
 
 /// The result of a DELETE operation
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq,Serialize,Deserialize)]
 pub struct DeleteResult {
     /// The number of rows affected by the DELETE operation
     pub rows_affected: u64,

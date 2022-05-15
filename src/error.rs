@@ -1,5 +1,5 @@
 /// An error from unsuccessful database operations
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone,Serialize,Deserialize)]
 pub enum DbErr {
     /// There was a problem with the database connection
     Conn(String),
